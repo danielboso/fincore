@@ -1,18 +1,15 @@
-import { createContext, useContext } from 'react'
+import { createContext } from 'react'
 
-export type AuthContextType = {
+export interface User {
+  id: string
+  username: string
+  name: string | null
+}
+
+export interface AuthContextType {
   isAuthenticated: boolean
-  user: { username: string } | null
-  login: (username: string) => void
-  logout: () => void
+  user: User | null
+  isLoading: boolean
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
-}
+export const AuthContext = createContext<AuthContextType | null>(null)

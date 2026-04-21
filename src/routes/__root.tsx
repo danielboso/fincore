@@ -1,20 +1,26 @@
-import { HeadContent, Outlet, Scripts, createRootRoute, useRouter } from "@tanstack/react-router"
+import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
-import { useEffect } from "react"
 import appCss from "../styles.css?url"
 import { AuthProvider } from "@/core/auth-provider"
-import { useAuth } from "@/core/auth-context"
-
+import { getSession } from "@/core/auth-functions"
+import type { User } from "@/core/auth-context"
 
 interface MyRouterContext {
   isAuthenticated: boolean
+  user: User | null
 }
 
-export const Route = createRootRoute({
-  context: () => ({
-    isAuthenticated: false,
-  } as MyRouterContext),
+const rootRouteContext = createRootRouteWithContext<MyRouterContext>()
+
+export const Route = rootRouteContext({
+  beforeLoad: async () => {
+    const session = await getSession()
+    return {
+      isAuthenticated: !!session,
+      user: session?.user ?? null,
+    }
+  },
   head: () => ({
     meta: [
       {
@@ -25,7 +31,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "Fincore",
       },
     ],
     links: [
@@ -41,36 +47,26 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
         <HeadContent />
       </head>
       <body>
-        <AuthProvider>
-          {children}
-          <Scripts />
-        </AuthProvider>
+        {children}
+        <Scripts />
       </body>
     </html>
   )
 }
 
 function RootComponent() {
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    router.update({
-      context: {
-        ...router.options.context,
-        isAuthenticated,
-      },
-    })
-  }, [isAuthenticated, router])
+  const { user, isAuthenticated } = Route.useRouteContext()
 
   return (
     <>
-      <Outlet />
+      <AuthProvider initialUser={user} initialIsAuthenticated={isAuthenticated}>
+        <Outlet />
+      </AuthProvider>
       <TanStackDevtools
         config={{
           position: "bottom-right",

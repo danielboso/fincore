@@ -1,43 +1,37 @@
-import { Link, useNavigate } from "@tanstack/react-router"
+import { useNavigate, Link } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { valibotResolver } from "@hookform/resolvers/valibot"
-import type { LoginSchema } from "@/features/auth/schemas";
+import type { RegisterSchema } from "@/features/auth/schemas"
 import { cn } from "@/lib/utils"
-import { 
-  Button, 
+import {
+  Button,
   Input,
   Label,
   FieldError,
   TextField,
 } from "@heroui/react"
-import { loginSchema } from "@/features/auth/schemas"
-import { loginAction } from "@/core/auth-functions"
+import { registerSchema } from "@/features/auth/schemas"
+import { registerAction } from "@/core/auth-functions"
+import { type ComponentProps } from "react"
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
   const navigate = useNavigate()
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { isSubmitting, errors },
-  } = useForm<LoginSchema>({
-    resolver: valibotResolver(loginSchema),
+  const { register, handleSubmit, setError, formState: { isSubmitting, errors } } = useForm<RegisterSchema>({
+    resolver: valibotResolver(registerSchema),
     defaultValues: {
+      name: "",
       username: "",
       password: "",
     },
   })
 
-  const onSubmit = async (data: LoginSchema) => {
+  const onSubmit = async (data: RegisterSchema) => {
     try {
-      await loginAction({ data })
+      await registerAction({ data })
       navigate({ to: "/" })
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Invalid username or password"
+      const message = err instanceof Error ? err.message : "Something went wrong"
       setError("root", { message })
     }
   }
@@ -45,9 +39,9 @@ export function LoginForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center text-center gap-2">
-        <h1 className="text-xl font-bold">Login to your account</h1>
+        <h1 className="text-xl font-bold">Create an account</h1>
         <p className="text-small text-default-500">
-          Enter your username below to login to your account
+          Enter your details below to create an account
         </p>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -56,6 +50,21 @@ export function LoginForm({
             {errors.root.message}
           </div>
         )}
+        <TextField 
+          name="name" 
+          className="flex flex-col gap-1"
+          isInvalid={!!errors.name}
+        >
+          <Label className="text-sm font-medium">Full Name</Label>
+          <Input
+            placeholder="John Doe"
+            type="text"
+            {...register("name")}
+          />
+          <FieldError className="text-xs text-danger">
+            {errors.name?.message}
+          </FieldError>
+        </TextField>
         <TextField 
           name="username" 
           className="flex flex-col gap-1"
@@ -86,17 +95,17 @@ export function LoginForm({
             {errors.password?.message}
           </FieldError>
         </TextField>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full mt-2"
           isDisabled={isSubmitting}
         >
-          {isSubmitting ? "Logging in..." : "Login"}
+          {isSubmitting ? "Creating account..." : "Sign Up"}
         </Button>
         <div className="text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link to="/register" className="underline underline-offset-4">
-            Sign up
+          Already have an account?{" "}
+          <Link to="/login" className="underline underline-offset-4">
+            Login
           </Link>
         </div>
       </form>

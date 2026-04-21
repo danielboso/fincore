@@ -1,23 +1,23 @@
-import { useCallback, useMemo, useState } from 'react'
-import { AuthContext } from './auth-context'
-import type { ReactNode } from 'react';
+import { useMemo } from 'react'
+import { AuthContext, type User } from './auth-context'
+import type { ReactNode } from 'react'
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<{ username: string } | null>(null)
-
-  const login = useCallback((username: string) => {
-    setUser({ username })
-  }, [])
-
-  const logout = useCallback(() => {
-    setUser(null)
-  }, [])
-
-  const isAuthenticated = !!user
-
+export function AuthProvider({
+  children,
+  initialUser,
+  initialIsAuthenticated
+}: {
+  children: ReactNode,
+  initialUser: User | null,
+  initialIsAuthenticated: boolean
+}) {
   const value = useMemo(
-    () => ({ isAuthenticated, user, login, logout }),
-    [isAuthenticated, user, login, logout]
+    () => ({
+      isAuthenticated: initialIsAuthenticated,
+      user: initialUser,
+      isLoading: false,
+    }),
+    [initialUser, initialIsAuthenticated]
   )
 
   return (
