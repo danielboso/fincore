@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
-import { valibotResolver } from "@hookform/resolvers/valibot"
+import { useForm } from "@tanstack/react-form"
 import type { LoginSchema } from "@/features/auth/schemas";
 import { cn } from "@/lib/utils"
 import { 
@@ -19,28 +18,29 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate()
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { isSubmitting, errors },
-  } = useForm<LoginSchema>({
-    resolver: valibotResolver(loginSchema),
+  const form = useForm({
+    validators: {
+      onChange: loginSchema,
+    },
     defaultValues: {
       username: "",
       password: "",
+    } as LoginSchema,
+    onSubmit: async ({ value }) => {
+      try {
+        await loginAction({ data: value })
+        navigate({ to: "/" })
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Invalid username or password"
+        form.setErrorMap({
+          onSubmit: {
+            form: message,
+            fields: {},
+          },
+        })
+      }
     },
   })
-
-  const onSubmit = async (data: LoginSchema) => {
-    try {
-      await loginAction({ data })
-      navigate({ to: "/" })
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Invalid username or password"
-      setError("root", { message })
-    }
-  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -50,49 +50,84 @@ export function LoginForm({
           Enter your username below to login to your account
         </p>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {errors.root && (
-          <div className="text-sm font-medium text-danger">
-            {errors.root.message}
-          </div>
-        )}
-        <TextField 
-          name="username" 
-          className="flex flex-col gap-1"
-          isInvalid={!!errors.username}
-        >
-          <Label className="text-sm font-medium">Username</Label>
-          <Input
-            placeholder="Enter your username"
-            type="text"
-            {...register("username")}
-          />
-          <FieldError className="text-xs text-danger">
-            {errors.username?.message}
-          </FieldError>
-        </TextField>
-        <TextField 
-          name="password" 
-          className="flex flex-col gap-1"
-          isInvalid={!!errors.password}
-        >
-          <Label className="text-sm font-medium">Password</Label>
-          <Input
-            placeholder="Enter your password"
-            type="password"
-            {...register("password")}
-          />
-          <FieldError className="text-xs text-danger">
-            {errors.password?.message}
-          </FieldError>
-        </TextField>
-        <Button 
-          type="submit" 
-          className="w-full mt-2"
-          isDisabled={isSubmitting}
-        >
-          {isSubmitting ? "Logging in..." : "Login"}
-        </Button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
+        className="flex flex-col gap-4"
+      >
+        <form.Subscribe
+          selector={(state) => [state.errors]}
+          children={([errors]) =>
+            errors.length > 0 ? (
+              <div className="text-sm font-medium text-danger">
+                {errors.join(", ")}
+              </div>
+            ) : null
+          }
+        />
+        
+        <form.Field
+          name="username"
+          children={(field) => (
+            <TextField
+              className="flex flex-col gap-1"
+              isInvalid={!!field.state.meta.errors.length}
+            >
+              <Label className="text-sm font-medium">Username</Label>
+              <Input
+                placeholder="Enter your username"
+                type="text"
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+              <FieldError className="text-xs text-danger">
+                {field.state.meta.errors.join(", ")}
+              </FieldError>
+            </TextField>
+          )}
+        />
+
+        <form.Field
+          name="password"
+          children={(field) => (
+            <TextField
+              className="flex flex-col gap-1"
+              isInvalid={!!field.state.meta.errors.length}
+            >
+              <Label className="text-sm font-medium">Password</Label>
+              <Input
+                placeholder="Enter your password"
+                type="password"
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+              <FieldError className="text-xs text-danger">
+                {field.state.meta.errors.join(", ")}
+              </FieldError>
+            </TextField>
+          )}
+        />
+
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button
+              type="submit"
+              className="w-full mt-2"
+              isDisabled={!canSubmit || isSubmitting}
+            >
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
+          )}
+        />
+        
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link to="/register" className="underline underline-offset-4">
