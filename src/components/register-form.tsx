@@ -57,17 +57,6 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
         }}
         className="flex flex-col gap-4"
       >
-        <form.Subscribe
-          selector={(state) => [state.errors]}
-          children={([errors]) =>
-            errors.length > 0 ? (
-              <div className="text-sm font-medium text-danger">
-                {errors.join(", ")}
-              </div>
-            ) : null
-          }
-        />
-
         <form.Field
           name="name"
           children={(field) => (
@@ -85,7 +74,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldError className="text-xs text-danger">
-                {field.state.meta.errors.join(", ")}
+                {field.state.meta.errors[0]?.message}
               </FieldError>
             </TextField>
           )}
@@ -108,7 +97,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldError className="text-xs text-danger">
-                {field.state.meta.errors.join(", ")}
+                {field.state.meta.errors[0]?.message}
               </FieldError>
             </TextField>
           )}
@@ -131,7 +120,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldError className="text-xs text-danger">
-                {field.state.meta.errors.join(", ")}
+                {field.state.meta.errors[0]?.message}
               </FieldError>
             </TextField>
           )}
@@ -149,7 +138,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
             </Button>
           )}
         />
-        
+
         <div className="text-center text-sm">
           Already have an account?{" "}
           <Link to="/login" className="underline underline-offset-4">

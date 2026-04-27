@@ -111,7 +111,7 @@ function TransactionsPage() {
                     </ListBox>
                   </Select.Popover>
                   <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors[0]?.message}
                   </FieldError>
                 </Select>
               )}
@@ -130,7 +130,7 @@ function TransactionsPage() {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors[0]?.message}
                   </FieldError>
                 </TextField>
               )}
@@ -149,7 +149,7 @@ function TransactionsPage() {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors[0]?.message}
                   </FieldError>
                 </TextField>
               )}
@@ -168,7 +168,7 @@ function TransactionsPage() {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors[0]?.message}
                   </FieldError>
                 </TextField>
               )}
@@ -187,7 +187,7 @@ function TransactionsPage() {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors.join(", ")}
+                    {field.state.meta.errors[0]?.message}
                   </FieldError>
                 </TextField>
               )}

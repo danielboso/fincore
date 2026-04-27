@@ -2,8 +2,8 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import { useForm } from "@tanstack/react-form"
 import type { LoginSchema } from "@/features/auth/schemas";
 import { cn } from "@/lib/utils"
-import { 
-  Button, 
+import {
+  Button,
   Input,
   Label,
   FieldError,
@@ -58,17 +58,6 @@ export function LoginForm({
         }}
         className="flex flex-col gap-4"
       >
-        <form.Subscribe
-          selector={(state) => [state.errors]}
-          children={([errors]) =>
-            errors.length > 0 ? (
-              <div className="text-sm font-medium text-danger">
-                {errors.join(", ")}
-              </div>
-            ) : null
-          }
-        />
-        
         <form.Field
           name="username"
           children={(field) => (
@@ -86,7 +75,7 @@ export function LoginForm({
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldError className="text-xs text-danger">
-                {field.state.meta.errors.join(", ")}
+                {field.state.meta.errors[0]?.message}
               </FieldError>
             </TextField>
           )}
@@ -109,7 +98,7 @@ export function LoginForm({
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldError className="text-xs text-danger">
-                {field.state.meta.errors.join(", ")}
+                {field.state.meta.errors[0]?.message}
               </FieldError>
             </TextField>
           )}
@@ -127,7 +116,7 @@ export function LoginForm({
             </Button>
           )}
         />
-        
+
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link to="/register" className="underline underline-offset-4">
