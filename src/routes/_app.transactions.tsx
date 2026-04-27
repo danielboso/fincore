@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
   Button,
   Table,
@@ -16,13 +16,7 @@ import { TransactionType } from "@/features/transactions/types"
 import { useState } from "react"
 import { PlusIcon, Trash2Icon } from "lucide-react"
 
-export const Route = createFileRoute("/transactions")({
-  beforeLoad: ({ context }) => {
-    const { isAuthenticated } = context as { isAuthenticated: boolean }
-    if (!isAuthenticated) {
-      throw redirect({ to: '/login' })
-    }
-  },
+export const Route = createFileRoute("/_app/transactions")({
   loader: async () => {
     return await getTransactions()
   },
