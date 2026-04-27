@@ -27,7 +27,14 @@ function App() {
         <div>
           <h1 className="font-medium text-xl">Fincore</h1>
           <p>Welcome back, {user?.name || user?.username}!</p>
-          <Button className="mt-4" onClick={handleLogout}>Logout</Button>
+          <div className="mt-4 flex gap-2">
+            <Button onPress={() => navigate({ to: "/transactions" })}>
+              Go to Transactions
+            </Button>
+            <Button onPress={handleLogout}>
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
     </div>
