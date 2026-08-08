@@ -58,5 +58,13 @@
     "vite": "^7.3.1",
     "vitest": "^3.2.4",
     "web-vitals": "^5.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@heroui/shared-utils",
+      "esbuild",
+      "msw",
+      "unrs-resolver"
+    ]
   }
 }

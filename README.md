@@ -70,15 +70,43 @@ The frontend application (`apps/frontend/src`) enforces strict dependency bounda
 
 ## 🚀 Getting Started
 
-*(Instructions will be updated once the initial release is ready.)*
+### 🐳 Manual Docker Compose Deployment
 
-### Casa OS 1-Click Install
-[Placeholder: Link to the Casa OS App Store or custom install instructions]
+If you want to run Fincore on a standard Docker server using Docker Compose:
 
-### Manual Docker Deployment
-```yaml
-# docker-compose.yml example coming soon
-```
+1. Create a `docker-compose.yml` file with the following configuration:
+   ```yaml
+   version: '3.8'
+   services:
+     app:
+       image: ghcr.io/danielboso/fincore:latest
+       container_name: fincore-app
+       restart: unless-stopped
+       ports:
+         - "3000:3000"
+       environment:
+         - DATABASE_URL=postgres://fincore_user:fincore_pass@db:5432/fincore_db
+         - PORT=3000
+       depends_on:
+         - db
+     db:
+       image: postgres:18-alpine
+       container_name: fincore-db
+       restart: unless-stopped
+       environment:
+         POSTGRES_USER: fincore_user
+         POSTGRES_PASSWORD: fincore_pass
+         POSTGRES_DB: fincore_db
+       volumes:
+         - postgres_data:/var/lib/postgresql/data
+   volumes:
+     postgres_data:
+   ```
+2. Run the deployment command:
+   ```bash
+   docker compose up -d
+   ```
+3. Fincore will be available at `http://localhost:3000`. Database migrations will automatically run on startup.
 
 ### Local Development Setup
 
