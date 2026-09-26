@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Rich Gold Gradients for the 3D Coin -->
+    <linearGradient id="gold-outer" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2A8" />
+      <stop offset="25%" stop-color="#D4AF37" />
+      <stop offset="50%" stop-color="#AA771C" />
+      <stop offset="75%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#FFDF73" />
+    </linearGradient>
+    
+    <linearGradient id="gold-inner" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9C7212" />
+      <stop offset="50%" stop-color="#F2CA00" />
+      <stop offset="100%" stop-color="#D9A814" />
+    </linearGradient>
+    
+    <!-- Directional Platinum Gradients for 3D Facets -->
+    <linearGradient id="plat-up" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E2E8F0" />
+    </linearGradient>
+    <linearGradient id="plat-down" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#64748B" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+    <linearGradient id="plat-left" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="100%" stop-color="#CBD5E1" />
+    </linearGradient>
+    <linearGradient id="plat-right" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94A3B8" />
+      <stop offset="100%" stop-color="#64748B" />
+    </linearGradient>
+
+    <!-- Shadow effects -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="15" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="inner-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#5E3F00" flood-opacity="0.7"/>
+    </filter>
+    <filter id="f-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="3" dy="8" stdDeviation="6" flood-color="#4A2E00" flood-opacity="0.7"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Coin Edge -->
+  <circle cx="250" cy="250" r="240" fill="url(#gold-outer)" filter="url(#shadow)" />
+  
+  <!-- Outer Rim Highlight -->
+  <circle cx="250" cy="250" r="238" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.4" />
+  <circle cx="250" cy="250" r="240" fill="none" stroke="#7A5600" stroke-width="4" opacity="0.6" />
+
+  <!-- Inner Coin Surface (Raised) -->
+  <circle cx="250" cy="250" r="200" fill="url(#gold-inner)" filter="url(#inner-shadow)" />
+  
+  <!-- Engraved Detail Ring -->
+  <circle cx="250" cy="250" r="170" fill="none" stroke="#A67B27" stroke-width="3" stroke-dasharray="14 10" />
+
+  <!-- The F (Chiseled 3D Faceted Platinum) -->
+  <!-- SkewX adds the forward slant while keeping perfect geometry -->
+  <g transform="translate(250, 250) skewX(-12) translate(-250, -250)" filter="url(#f-shadow)">
+    <!-- Base F (Prevents microscopic gaps) -->
+    <path d="M 190,360 L 190,140 L 330,140 L 330,190 L 250,190 L 250,225 L 310,225 L 310,275 L 250,275 L 250,360 Z" fill="#94A3B8" />
+
+    <!-- 3D Geometric Facets -->
+    <polygon points="190,140 330,140 330,165 220,165" fill="url(#plat-up)" />
+    <polygon points="220,165 330,165 330,190 250,190" fill="url(#plat-down)" />
+    <polygon points="190,140 220,165 220,250 220,360 190,360" fill="url(#plat-left)" />
+    <polygon points="250,190 220,165 220,250 250,225" fill="url(#plat-right)" />
+    <polygon points="220,250 250,225 310,225 310,250" fill="url(#plat-up)" />
+    <polygon points="220,250 310,250 310,275 250,275" fill="url(#plat-down)" />
+    <polygon points="220,250 250,275 250,360 220,360" fill="url(#plat-right)" />
+
+    <!-- Ridge Highlights (Specular reflections) -->
+    <path d="M 190,140 L 220,165 L 330,165" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.9" />
+    <path d="M 220,165 L 220,360" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.5" />
+    <path d="M 220,250 L 310,250" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.9" />
+    <path d="M 250,190 L 220,165" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.3" />
+    <path d="M 250,225 L 220,250" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.3" />
+    <path d="M 250,275 L 220,250" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.3" />
+    
+    <!-- Outer Edge Highlights -->
+    <path d="M 190,360 L 190,140 L 330,140" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.8" />
+  </g>
+
+  <!-- Little Sparkles -->
+  <g fill="#FFFFFF" opacity="0.8" filter="url(#glow)">
+    <path d="M 390,110 Q 400,110 400,100 Q 400,110 410,110 Q 400,110 400,120 Q 400,110 390,110 Z" />
+    <path d="M 120,380 Q 125,380 125,375 Q 125,380 130,380 Q 125,380 125,385 Q 125,380 120,380 Z" />
+    <path d="M 100,140 Q 110,140 110,130 Q 110,140 120,140 Q 110,140 110,150 Q 110,140 100,140 Z" />
+  </g>
+</svg>
