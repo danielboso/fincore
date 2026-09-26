@@ -1,7 +1,8 @@
-<!-- fincore banner/logo placeholder -->
 <div align="center">
-  <h1>💰 Fincore</h1>
-  <p><b>Your Personal Financial Command Center for Casa OS</b></p>
+  <img src="public/logo.svg" alt="Fincore Logo" width="130" />
+  <h1>Fincore</h1>
+  <br />
+  <p><b>Your Personal Financial Command Center for CasaOS</b></p>
 
   <p>
     <a href="https://github.com/danielboso/fincore/issues">
@@ -69,6 +70,21 @@ The frontend application (`apps/frontend/src`) enforces strict dependency bounda
 *   **Deployment**: Docker / Docker Compose (Optimized for Casa OS)
 
 ## 🚀 Getting Started
+
+### 🏠 CasaOS Installation (Recommended)
+
+To run Fincore on your CasaOS home server, use the **Custom Install** feature:
+
+1. Copy the contents of the [`docker-compose.casaos.yml`](./docker-compose.casaos.yml) file.
+2. Open your CasaOS Dashboard.
+3. Click **App Store** -> **Custom Install** (top-right corner).
+4. Click the **Import** button (top-right of the dialog).
+5. Paste the copied YAML content and click **Submit**.
+6. CasaOS will automatically populate all metadata (icon, description, ports, environment variables).
+7. (Optional) Customize the Database setting:
+   - `DATABASE_URL`: Set this to your external/shared PostgreSQL connection string (e.g. `postgresql://user:pass@192.168.1.100:5432/fincore`).
+   > **Note:** Fincore will automatically create the database if it doesn't already exist on your shared PostgreSQL server!
+8. Click **Install**. CasaOS will pull the image and launch Fincore!
 
 ### 🐳 Manual Docker Compose Deployment
 
