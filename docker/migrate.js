@@ -1,6 +1,45 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
+import { URL } from 'url';
+
+async function ensureDatabaseExists(databaseUrl) {
+  const url = new URL(databaseUrl);
+  const targetDbName = url.pathname.slice(1);
+  
+  if (!targetDbName || targetDbName === 'postgres') return;
+
+  url.pathname = '/postgres';
+  const defaultDbUrl = url.toString();
+
+  const maxRetries = 10;
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    const client = postgres(defaultDbUrl, { max: 1, onnotice: () => {}, connect_timeout: 5 });
+    try {
+      const result = await client`SELECT 1 FROM pg_database WHERE datname = ${targetDbName}`;
+      if (result.length === 0) {
+        console.log(`⏳ Database "${targetDbName}" does not exist. Creating...`);
+        await client.unsafe(`CREATE DATABASE "${targetDbName}"`);
+        console.log(`✅ Database "${targetDbName}" created successfully!`);
+      } else {
+        console.log(`✅ Database "${targetDbName}" already exists.`);
+      }
+      await client.end();
+      return;
+    } catch (error) {
+      await client.end().catch(() => {}); // Ignore end errors
+      retries++;
+      console.warn(`⚠️ Could not verify/create database (attempt ${retries}/${maxRetries}): ${error.message}`);
+      if (retries >= maxRetries) {
+        console.warn(`⚠️ Max retries reached for database creation check. Proceeding anyway...`);
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+  }
+}
 
 async function run() {
   const url = process.env.DATABASE_URL;
@@ -8,6 +47,8 @@ async function run() {
     console.error("❌ DATABASE_URL environment variable is not defined");
     process.exit(1);
   }
+
+  await ensureDatabaseExists(url);
 
   const maxRetries = 10;
   let retries = 0;

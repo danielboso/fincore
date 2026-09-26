@@ -10,7 +10,8 @@ services:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - PORT=3000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:18-alpine
@@ -24,6 +25,11 @@ services:
       - "${DB_LOCAL_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
