@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import  { type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { AuthContext, type User } from './auth-context'
 
 export function AuthProvider({

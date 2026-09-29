@@ -2,7 +2,7 @@ import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanst
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import appCss from "../styles.css?url"
-import  { type User } from "@/core/auth-context"
+import { type User } from "@/core/auth-context"
 import { AuthProvider } from "@/core/auth-provider"
 import { getSession } from "@/core/auth-functions"
 import "@/core/i18n/config"
