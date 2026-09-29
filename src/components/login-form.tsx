@@ -1,14 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useForm } from "@tanstack/react-form"
-import type { LoginSchema } from "@/features/auth/schemas";
-import { cn } from "@/lib/utils"
 import {
   Button,
+  FieldError,
   Input,
   Label,
-  FieldError,
   TextField,
 } from "@heroui/react"
+import { type LoginSchema } from "@/features/auth/schemas";
+import { cn } from "@/lib/utils"
 import { loginSchema } from "@/features/auth/schemas"
 import { loginAction } from "@/core/auth-functions"
 

@@ -1,4 +1,4 @@
-import { scryptSync, randomBytes, timingSafeEqual } from "node:crypto"
+import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto"
 
 const KEY_LENGTH = 64
 const SALT_LENGTH = 16

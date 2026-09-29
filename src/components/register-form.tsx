@@ -1,17 +1,17 @@
-import { useNavigate, Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { useForm } from "@tanstack/react-form"
-import type { RegisterSchema } from "@/features/auth/schemas"
-import { cn } from "@/lib/utils"
 import {
   Button,
+  FieldError,
   Input,
   Label,
-  FieldError,
   TextField,
 } from "@heroui/react"
+import { type ComponentProps } from "react";
+import { type RegisterSchema } from "@/features/auth/schemas"
+import { cn } from "@/lib/utils"
 import { registerSchema } from "@/features/auth/schemas"
 import { registerAction } from "@/core/auth-functions"
-import { type ComponentProps } from "react"
 
 export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
   const navigate = useNavigate()

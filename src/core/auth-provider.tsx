@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
+import  { type ReactNode } from 'react'
 import { AuthContext, type User } from './auth-context'
-import type { ReactNode } from 'react'
 
 export function AuthProvider({
   children,

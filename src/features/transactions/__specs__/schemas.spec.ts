@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import * as v from 'valibot'
 import { insertTransactionSchema } from '../schemas'
 import { TransactionType } from '../types'
