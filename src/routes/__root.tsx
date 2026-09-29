@@ -2,9 +2,10 @@ import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanst
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import appCss from "../styles.css?url"
+import  { type User } from "@/core/auth-context"
 import { AuthProvider } from "@/core/auth-provider"
 import { getSession } from "@/core/auth-functions"
-import type { User } from "@/core/auth-context"
+import "@/core/i18n/config"
 
 interface MyRouterContext {
   isAuthenticated: boolean
@@ -35,6 +36,15 @@ export const Route = rootRouteContext({
       },
     ],
     links: [
+      {
+        rel: "icon",
+        type: "image/x-icon",
+        href: "/favicon.ico",
+      },
+      {
+        rel: "manifest",
+        href: "/manifest.json",
+      },
       {
         rel: "stylesheet",
         href: appCss,
