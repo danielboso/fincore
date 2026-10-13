@@ -1,20 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
   Button,
-  Table,
+  FieldError,
   Input,
   Label,
-  FieldError,
-  TextField,
-  Select,
   ListBox,
+  Select,
+  Table,
+  TextField,
 } from "@heroui/react"
 import { useForm } from "@tanstack/react-form"
-import { insertTransactionSchema, type InsertTransactionSchema } from "@/features/transactions/schemas"
-import { createTransaction, getTransactions, deleteTransaction } from "@/features/transactions/functions"
-import { TransactionType } from "@/features/transactions/types"
 import { useState } from "react"
-import { PlusIcon, Trash2Icon } from "lucide-react"
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react"
+import { type InsertTransactionSchema, insertTransactionSchema } from "@/features/transactions/schemas"
+import { createTransaction, deleteTransaction, getTransactions } from "@/features/transactions/functions"
+import { TransactionType } from "@/features/transactions/types"
+import { EditTransactionForm } from "@/features/transactions/components/edit-transaction-form"
 
 export const Route = createFileRoute("/_app/transactions")({
   loader: async () => {
@@ -32,10 +33,13 @@ const columns = [
   { id: "actions", label: "ACTIONS" },
 ]
 
+
+
 function TransactionsPage() {
   const transactions = Route.useLoaderData()
   const navigate = useNavigate()
   const [isAdding, setIsAdding] = useState(false)
+  const [editingTransaction, setEditingTransaction] = useState<any | null>(null)
 
   const form = useForm({
     validators: {
@@ -71,13 +75,27 @@ function TransactionsPage() {
     <div className="p-6 flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Transactions</h1>
-        <Button onPress={() => setIsAdding(!isAdding)}>
+        <Button onPress={() => {
+          setIsAdding(!isAdding)
+          if (!isAdding) setEditingTransaction(null)
+        }}>
           <PlusIcon size={18} />
           {isAdding ? "Cancel" : "Add Transaction"}
         </Button>
       </div>
 
-      {isAdding && (
+      {editingTransaction && !isAdding && (
+        <EditTransactionForm
+          transaction={editingTransaction}
+          onClose={() => setEditingTransaction(null)}
+          onSuccess={() => {
+            setEditingTransaction(null)
+            navigate({ to: '/transactions', replace: true })
+          }}
+        />
+      )}
+
+      {isAdding && !editingTransaction && (
         <div className="bg-default-50 p-4 rounded-lg border border-divider">
           <form
             onSubmit={(e) => {
@@ -234,12 +252,25 @@ function TransactionsPage() {
                   <Table.Cell>{item.transactionDate}</Table.Cell>
                   <Table.Cell>{item.paymentDate}</Table.Cell>
                   <Table.Cell>
-                    <Button
-                      isIconOnly
-                      onPress={() => handleDelete(item.id)}
-                    >
-                      <Trash2Icon size={18} />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        isIconOnly
+                        variant="ghost"
+                        onPress={() => {
+                          setEditingTransaction(item)
+                          setIsAdding(false)
+                        }}
+                      >
+                        <PencilIcon size={18} />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        variant="danger-soft"
+                        onPress={() => handleDelete(item.id)}
+                      >
+                        <Trash2Icon size={18} />
+                      </Button>
+                    </div>
                   </Table.Cell>
                 </Table.Row>
               )}
