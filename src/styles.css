@@ -1,26 +1,35 @@
 @import "tailwindcss";
 @import "@heroui/react/styles";
 @import "@fontsource-variable/inter";
+@import "@fontsource/jetbrains-mono";
 
 @source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 
 @custom-variant dark (&:is(.dark *));
 
+.dark,
+:root {
+  --background: #000000;
+}
+
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Inter Variable', sans-serif;
-    --radius: 0.125rem;
+  --font-heading: var(--font-sans);
+  --font-sans: 'Inter Variable', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 @layer base {
   * {
     @apply border-border;
-    }
+  }
   body {
     @apply bg-background text-foreground antialiased;
-    }
+  }
   html {
     @apply font-sans;
     scrollbar-gutter: stable;
-    }
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }
