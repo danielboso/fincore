@@ -5,6 +5,42 @@
     "logout": "Sair",
     "language": "Idioma",
     "en": "Inglês",
-    "pt": "Português"
+    "pt": "Português",
+    "common": {
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "deleteConfirm": "Tem certeza que deseja excluir esta transação?"
+    },
+    "transactionsPage": {
+      "title": "Transações",
+      "subtitle": "Gerenciamento e histórico financeiro consolidado",
+      "newTransaction": "Nova Transação",
+      "editTransaction": "Editar Lançamento",
+      "columns": {
+        "type": "TIPO",
+        "description": "DESCRIÇÃO",
+        "value": "VALOR",
+        "transactionDate": "DATA TRANSAÇÃO",
+        "paymentDate": "DATA PAGAMENTO",
+        "actions": "AÇÕES"
+      },
+      "types": {
+        "income": "Receita",
+        "expense": "Despesa"
+      },
+      "form": {
+        "typeLabel": "Tipo",
+        "typePlaceholder": "Selecione o tipo",
+        "valueLabel": "Valor (ex: 150.00)",
+        "valuePlaceholder": "0.00",
+        "descriptionLabel": "Descrição",
+        "descriptionPlaceholder": "Ex: Aluguel, Supermercado, Salário...",
+        "transactionDateLabel": "Data da Transação",
+        "paymentDateLabel": "Data de Pagamento",
+        "saveTransaction": "Salvar Lançamento",
+        "saveChanges": "Salvar Alterações"
+      }
+    }
   }
 }

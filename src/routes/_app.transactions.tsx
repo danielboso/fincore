@@ -1,21 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import {
-  Button,
-  FieldError,
-  Input,
-  Label,
-  ListBox,
-  Select,
-  Table,
-  TextField,
-} from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
-import { useState } from "react"
+import { Button, Table } from "@heroui/react"
+import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react"
-import { type InsertTransactionSchema, insertTransactionSchema } from "@/features/transactions/schemas"
-import { createTransaction, deleteTransaction, getTransactions } from "@/features/transactions/functions"
-import { TransactionType } from "@/features/transactions/types"
-import { EditTransactionForm } from "@/features/transactions/components/edit-transaction-form"
+import {
+  deleteTransaction,
+  getTransactions,
+} from "@/features/transactions/functions"
+import { TransactionType, type Transaction } from "@/features/transactions/types"
+import { TransactionModal } from "@/features/transactions/components/transaction-modal"
 
 export const Route = createFileRoute("/_app/transactions")({
   loader: async () => {
@@ -24,251 +17,139 @@ export const Route = createFileRoute("/_app/transactions")({
   component: TransactionsPage,
 })
 
-const columns = [
-  { id: "type", label: "TYPE" },
-  { id: "description", label: "DESCRIPTION" },
-  { id: "value", label: "VALUE" },
-  { id: "transactionDate", label: "TRANSACTION DATE" },
-  { id: "paymentDate", label: "PAYMENT DATE" },
-  { id: "actions", label: "ACTIONS" },
-]
-
-
-
 function TransactionsPage() {
   const transactions = Route.useLoaderData()
   const navigate = useNavigate()
-  const [isAdding, setIsAdding] = useState(false)
-  const [editingTransaction, setEditingTransaction] = useState<any | null>(null)
+  const { t } = useTranslation()
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null)
 
-  const form = useForm({
-    validators: {
-      onChange: insertTransactionSchema,
-    },
-    defaultValues: {
-      type: TransactionType.EXPENSE,
-      value: "",
-      description: "",
-      transactionDate: new Date().toISOString().split('T')[0],
-      paymentDate: new Date().toISOString().split('T')[0],
-    } as InsertTransactionSchema,
-    onSubmit: async ({ value }) => {
-      try {
-        await createTransaction({ data: value })
-        form.reset()
-        setIsAdding(false)
-        navigate({ to: '/transactions', replace: true })
-      } catch (err) {
-        console.error(err)
-      }
-    },
-  })
+  const columns = useMemo(
+    () => [
+      { id: "type", label: t("transactionsPage.columns.type") },
+      { id: "description", label: t("transactionsPage.columns.description") },
+      { id: "value", label: t("transactionsPage.columns.value") },
+      {
+        id: "transactionDate",
+        label: t("transactionsPage.columns.transactionDate"),
+      },
+      { id: "paymentDate", label: t("transactionsPage.columns.paymentDate") },
+      { id: "actions", label: t("transactionsPage.columns.actions") },
+    ],
+    [t]
+  )
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this transaction?")) {
+    if (confirm(t("common.deleteConfirm"))) {
       await deleteTransaction({ data: id })
-      navigate({ to: '/transactions', replace: true })
+      await navigate({ to: "/transactions", replace: true })
     }
   }
 
+  const handleOpenCreate = () => {
+    setSelectedTransaction(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEdit = (transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setIsModalOpen(true)
+  }
+
   return (
-    <div className="p-6 flex flex-col gap-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Transactions</h1>
-        <Button onPress={() => {
-          setIsAdding(!isAdding)
-          if (!isAdding) setEditingTransaction(null)
-        }}>
+    <div className="flex flex-col gap-6 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">
+            {t("transactionsPage.title")}
+          </h1>
+          <p className="text-xs text-zinc-400">
+            {t("transactionsPage.subtitle")}
+          </p>
+        </div>
+        <Button variant="primary" onPress={handleOpenCreate}>
           <PlusIcon size={18} />
-          {isAdding ? "Cancel" : "Add Transaction"}
+          <span>{t("transactionsPage.newTransaction")}</span>
         </Button>
       </div>
 
-      {editingTransaction && !isAdding && (
-        <EditTransactionForm
-          transaction={editingTransaction}
-          onClose={() => setEditingTransaction(null)}
-          onSuccess={() => {
-            setEditingTransaction(null)
-            navigate({ to: '/transactions', replace: true })
-          }}
-        />
-      )}
-
-      {isAdding && !editingTransaction && (
-        <div className="bg-default-50 p-4 rounded-lg border border-divider">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              form.handleSubmit()
-            }}
-            className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start"
-          >
-            <form.Field
-              name="type"
-              children={(field) => (
-                <Select
-                  isInvalid={!!field.state.meta.errors.length}
-                  placeholder="Select type"
-                  value={field.state.value}
-                  onChange={(val) => field.handleChange(val as TransactionType)}
-                >
-                  <Label className="text-sm font-medium">Type</Label>
-                  <Select.Trigger>
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Popover>
-                    <ListBox>
-                      <ListBox.Item id={TransactionType.EXPENSE} textValue="Expense">
-                        Expense
-                      </ListBox.Item>
-                      <ListBox.Item id={TransactionType.INCOME} textValue="Income">
-                        Income
-                      </ListBox.Item>
-                    </ListBox>
-                  </Select.Popover>
-                  <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors[0]?.message}
-                  </FieldError>
-                </Select>
-              )}
-            />
-
-            <form.Field
-              name="description"
-              children={(field) => (
-                <TextField isInvalid={!!field.state.meta.errors.length}>
-                  <Label className="text-sm font-medium">Description</Label>
-                  <Input
-                    placeholder="Rent, Groceries..."
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors[0]?.message}
-                  </FieldError>
-                </TextField>
-              )}
-            />
-
-            <form.Field
-              name="value"
-              children={(field) => (
-                <TextField isInvalid={!!field.state.meta.errors.length}>
-                  <Label className="text-sm font-medium">Value</Label>
-                  <Input
-                    placeholder="0.00"
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors[0]?.message}
-                  </FieldError>
-                </TextField>
-              )}
-            />
-
-            <form.Field
-              name="transactionDate"
-              children={(field) => (
-                <TextField isInvalid={!!field.state.meta.errors.length}>
-                  <Label className="text-sm font-medium">Transaction Date</Label>
-                  <Input
-                    type="date"
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors[0]?.message}
-                  </FieldError>
-                </TextField>
-              )}
-            />
-
-            <form.Field
-              name="paymentDate"
-              children={(field) => (
-                <TextField isInvalid={!!field.state.meta.errors.length}>
-                  <Label className="text-sm font-medium">Payment Date</Label>
-                  <Input
-                    type="date"
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldError className="text-xs text-danger">
-                    {field.state.meta.errors[0]?.message}
-                  </FieldError>
-                </TextField>
-              )}
-            />
-
-            <div className="md:col-span-5 flex justify-end">
-              <form.Subscribe
-                selector={(state) => [state.canSubmit, state.isSubmitting]}
-                children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" isDisabled={!canSubmit}>
-                    {isSubmitting ? "Saving..." : "Save Transaction"}
-                  </Button>
-                )}
-              />
-            </div>
-          </form>
-        </div>
-      ) }
-
-      <Table>
+      <Table
+        variant="secondary"
+        className="overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-950/95 shadow-2xl backdrop-blur-xl"
+      >
         <Table.ScrollContainer>
-          <Table.Content aria-label="Transactions table">
-            <Table.Header columns={columns}>
+          <Table.Content aria-label="Tabela de transações" className="min-w-full">
+            <Table.Header
+              columns={columns}
+              className="border-b border-white/[0.06] bg-zinc-900/50"
+            >
               {(column) => (
-                <Table.Column id={column.id}>
+                <Table.Column
+                  id={column.id}
+                  className="!rounded-none !bg-zinc-900/50 px-4 py-3 font-mono text-xs font-semibold tracking-wider text-zinc-400"
+                >
                   {column.label}
                 </Table.Column>
               )}
             </Table.Header>
             <Table.Body items={transactions}>
               {(item) => (
-                <Table.Row id={item.id}>
-                  <Table.Cell>
-                    <span className={item.type === TransactionType.INCOME ? 'text-success font-medium' : 'text-danger font-medium'}>
-                      {item.type}
+                <Table.Row
+                  id={item.id}
+                  className="border-b border-white/[0.04] transition-colors hover:!bg-zinc-900/40"
+                >
+                  <Table.Cell className="px-4 py-3.5">
+                    <span
+                      className={
+                        item.type === TransactionType.INCOME
+                          ? "font-medium text-emerald-400"
+                          : "font-medium text-rose-400"
+                      }
+                    >
+                      {item.type === TransactionType.INCOME
+                        ? t("transactionsPage.types.income")
+                        : t("transactionsPage.types.expense")}
                     </span>
                   </Table.Cell>
-                  <Table.Cell>{item.description}</Table.Cell>
-                  <Table.Cell className="font-mono">
-                    <span className={item.type === TransactionType.INCOME ? 'text-success' : 'text-danger'}>
-                      {item.type === TransactionType.INCOME ? '+' : '-'}{item.value}
+                  <Table.Cell className="px-4 py-3.5 font-medium text-zinc-200">
+                    {item.description}
+                  </Table.Cell>
+                  <Table.Cell className="px-4 py-3.5 font-mono font-semibold">
+                    <span
+                      className={
+                        item.type === TransactionType.INCOME
+                          ? "text-emerald-400"
+                          : "text-rose-400"
+                      }
+                    >
+                      {item.type === TransactionType.INCOME ? "+" : "-"}R${" "}
+                      {item.value}
                     </span>
                   </Table.Cell>
-                  <Table.Cell>{item.transactionDate}</Table.Cell>
-                  <Table.Cell>{item.paymentDate}</Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell className="px-4 py-3.5 font-mono text-zinc-400">
+                    {item.transactionDate}
+                  </Table.Cell>
+                  <Table.Cell className="px-4 py-3.5 font-mono text-zinc-400">
+                    {item.paymentDate}
+                  </Table.Cell>
+                  <Table.Cell className="px-4 py-3.5">
                     <div className="flex gap-2">
                       <Button
                         isIconOnly
                         variant="ghost"
-                        onPress={() => {
-                          setEditingTransaction(item)
-                          setIsAdding(false)
-                        }}
+                        size="sm"
+                        onPress={() => handleOpenEdit(item)}
                       >
-                        <PencilIcon size={18} />
+                        <PencilIcon size={16} />
                       </Button>
                       <Button
                         isIconOnly
                         variant="danger-soft"
+                        size="sm"
                         onPress={() => handleDelete(item.id)}
                       >
-                        <Trash2Icon size={18} />
+                        <Trash2Icon size={16} />
                       </Button>
                     </div>
                   </Table.Cell>
@@ -278,6 +159,15 @@ function TransactionsPage() {
           </Table.Content>
         </Table.ScrollContainer>
       </Table>
+
+      <TransactionModal
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        transaction={selectedTransaction}
+        onSuccess={async () => {
+          await navigate({ to: "/transactions", replace: true })
+        }}
+      />
     </div>
   )
 }

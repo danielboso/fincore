@@ -23,6 +23,13 @@ export const insertTransactionSchema = v.object({
 
 export type InsertTransactionSchema = v.InferOutput<typeof insertTransactionSchema>
 
+export const editTransactionSchema = v.object({
+  id: v.string(),
+  ...insertTransactionSchema.entries,
+})
+
+export type EditTransactionSchema = v.InferOutput<typeof editTransactionSchema>
+
 export const updateTransactionSchema = v.intersect([
   v.object({
     id: v.string(),

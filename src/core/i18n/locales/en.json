@@ -5,6 +5,42 @@
     "logout": "Logout",
     "language": "Language",
     "en": "English",
-    "pt": "Portuguese"
+    "pt": "Portuguese",
+    "common": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "deleteConfirm": "Are you sure you want to delete this transaction?"
+    },
+    "transactionsPage": {
+      "title": "Transactions",
+      "subtitle": "Consolidated financial management and history",
+      "newTransaction": "New Transaction",
+      "editTransaction": "Edit Transaction",
+      "columns": {
+        "type": "TYPE",
+        "description": "DESCRIPTION",
+        "value": "VALUE",
+        "transactionDate": "TRANSACTION DATE",
+        "paymentDate": "PAYMENT DATE",
+        "actions": "ACTIONS"
+      },
+      "types": {
+        "income": "Income",
+        "expense": "Expense"
+      },
+      "form": {
+        "typeLabel": "Type",
+        "typePlaceholder": "Select type",
+        "valueLabel": "Value (e.g. 150.00)",
+        "valuePlaceholder": "0.00",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "E.g. Rent, Groceries, Salary...",
+        "transactionDateLabel": "Transaction Date",
+        "paymentDateLabel": "Payment Date",
+        "saveTransaction": "Save Transaction",
+        "saveChanges": "Save Changes"
+      }
+    }
   }
 }
