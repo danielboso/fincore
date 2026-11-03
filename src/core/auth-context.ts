@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 
 export interface User {
   id: string
@@ -13,3 +13,15 @@ export interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)
+
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext)
+  if (!context) {
+    return {
+      isAuthenticated: false,
+      user: null,
+      isLoading: false,
+    }
+  }
+  return context
+}
