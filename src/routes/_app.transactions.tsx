@@ -9,6 +9,7 @@ import {
 } from "@/features/transactions/functions"
 import { TransactionType, type Transaction } from "@/features/transactions/types"
 import { TransactionModal } from "@/features/transactions/components/transaction-modal"
+import { formatCentsToCurrency } from "@/lib/formatters"
 
 export const Route = createFileRoute("/_app/transactions")({
   loader: async () => {
@@ -29,7 +30,7 @@ function TransactionsPage() {
     () => [
       { id: "type", label: t("transactionsPage.columns.type") },
       { id: "description", label: t("transactionsPage.columns.description") },
-      { id: "value", label: t("transactionsPage.columns.value") },
+      { id: "valueInCents", label: t("transactionsPage.columns.value") },
       {
         id: "transactionDate",
         label: t("transactionsPage.columns.transactionDate"),
@@ -123,8 +124,8 @@ function TransactionsPage() {
                           : "text-rose-400"
                       }
                     >
-                      {item.type === TransactionType.INCOME ? "+" : "-"}R${" "}
-                      {item.value}
+                      {item.type === TransactionType.INCOME ? "+" : "-"}
+                      {formatCentsToCurrency(item.valueInCents)}
                     </span>
                   </Table.Cell>
                   <Table.Cell className="px-4 py-3.5 font-mono text-zinc-400">

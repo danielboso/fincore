@@ -3,9 +3,10 @@ import { TransactionType } from './types'
 
 export const insertTransactionSchema = v.object({
   type: v.enum(TransactionType, 'Type must be INCOME or EXPENSE'),
-  value: v.pipe(
-    v.string(),
-    v.regex(/^-?\d+(\.\d{1,2})?$/, 'Invalid amount format (e.g. 10.00)')
+  valueInCents: v.pipe(
+    v.number('Value must be a number'),
+    v.integer('Value must be an integer representing cents'),
+    v.minValue(1, 'Value must be greater than zero')
   ),
   description: v.pipe(
     v.string(),

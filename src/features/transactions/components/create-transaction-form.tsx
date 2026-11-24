@@ -9,10 +9,12 @@ import {
 } from "@heroui/react"
 import { useForm } from "@tanstack/react-form"
 import { useNavigate } from "@tanstack/react-router"
+import { type ChangeEvent, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { insertTransactionSchema } from "@/features/transactions/schemas"
 import { createTransaction } from "@/features/transactions/functions"
 import { TransactionType } from "@/features/transactions/types"
+import { parseToCents } from "@/lib/formatters"
 
 interface CreateTransactionFormProps {
   onSuccess: () => void
@@ -25,6 +27,7 @@ export function CreateTransactionForm({
 }: CreateTransactionFormProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const [displayValue, setDisplayValue] = useState("")
 
   const form = useForm({
     validators: {
@@ -32,7 +35,7 @@ export function CreateTransactionForm({
     },
     defaultValues: {
       type: TransactionType.EXPENSE,
-      value: "",
+      valueInCents: 0,
       description: "",
       transactionDate: new Date().toISOString().split("T")[0],
       paymentDate: new Date().toISOString().split("T")[0],
@@ -41,6 +44,7 @@ export function CreateTransactionForm({
       try {
         await createTransaction({ data: value })
         form.reset()
+        setDisplayValue("")
         onSuccess()
         await navigate({ to: "/transactions", replace: true })
       } catch (err) {
@@ -48,6 +52,15 @@ export function CreateTransactionForm({
       }
     },
   })
+
+  const handleAmountChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    onFieldChange: (cents: number) => void
+  ) => {
+    const raw = e.target.value
+    setDisplayValue(raw)
+    onFieldChange(parseToCents(raw))
+  }
 
   return (
     <form
@@ -105,7 +118,7 @@ export function CreateTransactionForm({
         />
 
         <form.Field
-          name="value"
+          name="valueInCents"
           children={(field) => (
             <TextField isInvalid={field.state.meta.errors.length > 0}>
               <Label className="text-sm font-medium">
@@ -114,9 +127,9 @@ export function CreateTransactionForm({
               <Input
                 placeholder={t("transactionsPage.form.valuePlaceholder")}
                 name={field.name}
-                value={field.state.value}
+                value={displayValue}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => handleAmountChange(e, field.handleChange)}
                 className="font-mono"
               />
               <FieldError className="text-xs text-danger">

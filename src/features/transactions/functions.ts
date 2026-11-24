@@ -34,7 +34,7 @@ export const createTransaction = createServerFn({ method: "POST" })
     const [result] = await db.insert(transactions).values({
       userId: session.user.id,
       type: data.type,
-      value: data.value,
+      valueInCents: data.valueInCents,
       description: data.description,
       transactionDate: data.transactionDate,
       paymentDate: data.paymentDate,

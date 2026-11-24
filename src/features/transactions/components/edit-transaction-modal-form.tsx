@@ -8,10 +8,12 @@ import {
   TextField,
 } from "@heroui/react"
 import { useForm } from "@tanstack/react-form"
+import { type ChangeEvent, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { editTransactionSchema } from "@/features/transactions/schemas"
 import { updateTransaction } from "@/features/transactions/functions"
 import { TransactionType, type Transaction } from "@/features/transactions/types"
+import { parseToCents } from "@/lib/formatters"
 
 interface EditTransactionModalFormProps {
   transaction: Transaction
@@ -25,6 +27,9 @@ export function EditTransactionModalForm({
   onCancel,
 }: EditTransactionModalFormProps) {
   const { t } = useTranslation()
+  const [displayValue, setDisplayValue] = useState(
+    transaction.valueInCents ? (transaction.valueInCents / 100).toFixed(2) : ""
+  )
 
   const form = useForm({
     validators: {
@@ -33,7 +38,7 @@ export function EditTransactionModalForm({
     defaultValues: {
       id: transaction.id,
       type: transaction.type,
-      value: transaction.value,
+      valueInCents: transaction.valueInCents,
       description: transaction.description,
       transactionDate: transaction.transactionDate,
       paymentDate: transaction.paymentDate,
@@ -47,6 +52,15 @@ export function EditTransactionModalForm({
       }
     },
   })
+
+  const handleAmountChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    onFieldChange: (cents: number) => void
+  ) => {
+    const raw = e.target.value
+    setDisplayValue(raw)
+    onFieldChange(parseToCents(raw))
+  }
 
   return (
     <form
@@ -104,7 +118,7 @@ export function EditTransactionModalForm({
         />
 
         <form.Field
-          name="value"
+          name="valueInCents"
           children={(field) => (
             <TextField isInvalid={field.state.meta.errors.length > 0}>
               <Label className="text-sm font-medium">
@@ -113,9 +127,9 @@ export function EditTransactionModalForm({
               <Input
                 placeholder={t("transactionsPage.form.valuePlaceholder")}
                 name={field.name}
-                value={field.state.value}
+                value={displayValue}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => handleAmountChange(e, field.handleChange)}
                 className="font-mono"
               />
               <FieldError className="text-xs text-danger">

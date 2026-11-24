@@ -1,4 +1,4 @@
-import { date, numeric, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { date, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { TransactionType } from "@/features/transactions/types"
 
 export const transactionTypeEnum = pgEnum('transaction_type', [TransactionType.INCOME, TransactionType.EXPENSE])
@@ -27,7 +27,7 @@ export const transactions = pgTable("transactions", {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   type: transactionTypeEnum('type').notNull().default(TransactionType.EXPENSE),
-  value: numeric("value", { precision: 10, scale: 2 }).notNull(),
+  valueInCents: integer("value_in_cents").notNull(),
   description: text("description").notNull(),
   transactionDate: date("transaction_date").notNull(),
   paymentDate: date("payment_date").notNull(),

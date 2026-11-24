@@ -15,7 +15,7 @@ vi.mock('@/core/server/db', () => ({
       id: '1', 
       userId: 'user-1',
       type: 'EXPENSE', 
-      value: '100.00',
+      valueInCents: 10000,
       description: 'Test',
       transactionDate: '2023-11-01',
       paymentDate: '2023-11-01',
@@ -110,7 +110,7 @@ describe('Transaction Server Functions', () => {
       const result = await createTransaction({
         data: {
           type: TransactionType.INCOME,
-          value: '200.00',
+          valueInCents: 20000,
           description: 'Salary',
           transactionDate: '2023-11-01',
           paymentDate: '2023-11-01'
@@ -127,7 +127,7 @@ describe('Transaction Server Functions', () => {
       await expect(createTransaction({
         data: {
           type: TransactionType.INCOME,
-          value: '200.00',
+          valueInCents: 20000,
           description: 'Salary',
           transactionDate: '2023-11-01',
           paymentDate: '2023-11-01'
