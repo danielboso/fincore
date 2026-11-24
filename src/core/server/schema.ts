@@ -4,7 +4,7 @@ import { TransactionType } from "@/features/transactions/types"
 export const transactionTypeEnum = pgEnum('transaction_type', [TransactionType.INCOME, TransactionType.EXPENSE])
 
 export const user = pgTable("user", {
-  id: text("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   name: text("name"),
@@ -14,7 +14,7 @@ export const user = pgTable("user", {
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   expiresAt: timestamp("expires_at").notNull(),
@@ -23,7 +23,7 @@ export const session = pgTable("session", {
 
 export const transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   type: transactionTypeEnum('type').notNull().default(TransactionType.EXPENSE),

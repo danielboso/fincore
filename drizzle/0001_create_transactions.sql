@@ -1,7 +1,7 @@
 CREATE TYPE "public"."transaction_type" AS ENUM('INCOME', 'EXPENSE');--> statement-breakpoint
 CREATE TABLE "transactions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid NOT NULL,
 	"type" "transaction_type" DEFAULT 'EXPENSE' NOT NULL,
 	"value_in_cents" integer NOT NULL,
 	"description" text NOT NULL,
