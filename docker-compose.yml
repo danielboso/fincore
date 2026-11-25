@@ -1,35 +1,51 @@
+name: fincore
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - PORT=${CONTAINER_PORT}
+    image: fincore:latest
     container_name: fincore-app
+    restart: unless-stopped
     ports:
-      - "${APP_LOCAL_PORT:-3000}:3000"
+      - "${APP_PORT}:${CONTAINER_PORT}"
     environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - PORT=3000
-    depends_on:
-      db:
-        condition: service_healthy
+      - NODE_ENV=production
+      - PORT=${CONTAINER_PORT}
+      - DATABASE_URL=${DATABASE_URL}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    labels:
+      icon: "https://raw.githubusercontent.com/danielboso/fincore/master/public/logo.svg"
+      dev.casaos.app.title: "Fincore"
+      dev.casaos.app.icon: "https://raw.githubusercontent.com/danielboso/fincore/master/public/logo.svg"
 
-  db:
-    image: postgres:18-alpine
-    container_name: fincore-database
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "${DB_LOCAL_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
+# CasaOS Metadata
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+    - arm
+  main: app
+  store_app_id: fincore
+  description:
+    en_us: "Fincore is a high-performance executive financial management and cash flow platform."
+    pt_br: "Fincore é uma plataforma moderna e de alta performance para gestão financeira e fluxo de caixa executivo."
+  tagline:
+    en_us: "Executive Cash Flow & Financial Management"
+    pt_br: "Gestão Financeira & Fluxo de Caixa Executivo"
+  developer: "Daniel Boso"
+  author: "Daniel Boso"
+  icon: "https://raw.githubusercontent.com/danielboso/fincore/master/public/logo.svg"
+  thumbnail: "https://raw.githubusercontent.com/danielboso/fincore/master/public/logo.svg"
+  title:
+    custom: "Fincore"
+    en_us: "Fincore"
+    pt_br: "Fincore"
+  category: "Finance"
+  scheme: "http"
+  port_map: "3000"
+  index: "/"

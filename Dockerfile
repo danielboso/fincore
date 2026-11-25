@@ -1,57 +1,50 @@
-# Stage 1: Build stage
-FROM node:22-alpine AS builder
-
-# Set working directory
+# syntax=docker/dockerfile:1
+# Base image shared across stages to prevent duplicate registry metadata lookups and TLS timeouts
+FROM node:22-slim AS base
 WORKDIR /app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@10.27.0 --activate
+RUN pnpm config set store-dir /pnpm/store
 
-# Install pnpm (pinned to v9 for compatibility with package.json settings)
-RUN npm install -g pnpm@9
-
-# Copy package configuration and lockfile
+# Stage 1: Production dependencies only (cached across code changes)
+FROM base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --prod --frozen-lockfile --prefer-offline --ignore-scripts
 
-# Install dependencies (including devDependencies for build)
-RUN pnpm install --frozen-lockfile
-
-# Copy the rest of the application code
+# Stage 2: Full dependencies & source code
+FROM base AS source
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile --prefer-offline
 COPY . .
 
-# Build the application
-RUN pnpm build
+# Stage 3 (Quality Gate): Test runner targeted by Jenkins
+FROM source AS tester
+RUN pnpm test
 
-# Prune dev dependencies to leave only production dependencies
-RUN pnpm prune --prod
-
-# Stage 2: Production runner stage
-FROM node:22-alpine AS runner
-
-WORKDIR /app
-
-# Set production environment variables
+# Stage 4: Application builder with bundler cache mount
+FROM source AS builder
 ENV NODE_ENV=production
-ENV PORT=3000
+RUN --mount=type=cache,target=/app/node_modules/.vite \
+    pnpm build
 
-# Copy the built output from builder
+# Stage 5: Production runner (minimal footprint)
+FROM base AS runner
+ENV NODE_ENV=production
+ARG PORT=3000
+ENV PORT=${PORT}
+
+COPY package.json ./package.json
+COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/.output ./.output
-
-# Copy node_modules (which contains only production dependencies after pnpm prune --prod)
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copy drizzle migration SQL files
 COPY --from=builder /app/drizzle ./drizzle
 
-# Copy package.json to preserve metadata and package type (type: module)
-COPY --from=builder /app/package.json ./package.json
-
-# Copy migrations runner script
+# Copy database migration runner & entrypoint
 COPY docker/migrate.js ./migrate.js
-
-# Copy and set up the entrypoint script
 COPY docker/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
-# Expose port
-EXPOSE 3000
-
-# Start the application via the entrypoint script
+EXPOSE ${PORT}
 ENTRYPOINT ["./entrypoint.sh"]
