@@ -22,7 +22,8 @@ COPY . .
 
 # Stage 3 (Quality Gate): Test runner targeted by Jenkins
 FROM source AS tester
-RUN pnpm test
+RUN --mount=type=cache,target=/app/node_modules/.vite \
+    pnpm test
 
 # Stage 4: Application builder with bundler cache mount
 FROM source AS builder

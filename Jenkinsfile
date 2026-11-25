@@ -5,7 +5,7 @@ pipeline {
         parallelsAlwaysFailFast()
         disableConcurrentBuilds(abortPrevious: true)
         skipDefaultCheckout(true)
-        timeout(time: 20, unit: 'MINUTES')
+        timeout(time: 30, unit: 'MINUTES')
         buildDiscarder(logRotator(numToKeepStr: '15', artifactNumToKeepStr: '5'))
         timestamps()
     }
@@ -67,7 +67,7 @@ pipeline {
                     if ! docker image inspect node:22-slim >/dev/null 2>&1; then
                         for i in 1 2 3; do docker pull node:22-slim && break || sleep 3; done
                     fi
-                    docker build --target tester -t "${IMAGE_NAME}:tester" .
+                    docker build --target tester --output type=cacheonly .
                 '''
             }
         }
