@@ -136,9 +136,10 @@ pipeline {
 
                     HEALTHY=false
                     for i in $(seq 1 30); do
-                        if curl -fsS "http://127.0.0.1:${APP_PORT}/" >/dev/null 2>&1 || curl -fsS "http://host.docker.internal:${APP_PORT}/" >/dev/null 2>&1; then
+                        if curl -fsS "http://127.0.0.1:${APP_PORT}/" >/dev/null 2>&1 || \
+                           docker exec "${CONTAINER_NAME}" node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/').then(r => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))" >/dev/null 2>&1; then
                             HEALTHY=true
-                            echo "✅ HTTP server respondendo na porta ${APP_PORT}!"
+                            echo "✅ HTTP server respondendo na porta ${APP_PORT} (Container:${CONTAINER_PORT})!"
                             break
                         fi
                         sleep 1
