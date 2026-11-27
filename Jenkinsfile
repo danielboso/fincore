@@ -130,17 +130,25 @@ pipeline {
 
                     if [ "$(docker inspect --format='{{.State.Status}}' "${CONTAINER_NAME}" 2>/dev/null || true)" != "running" ]; then
                         echo "❌ Container não atingiu o estado 'running'."
-                        docker logs --tail=40 "${CONTAINER_NAME}" 2>/dev/null || true
+                        docker logs --tail=40 "${CONTAINER_NAME}" || true
                         exit 1
                     fi
 
-                    for i in $(seq 1 15); do
-                        if curl -fsS "http://127.0.0.1:${APP_PORT}/" >/dev/null 2>&1; then
+                    HEALTHY=false
+                    for i in $(seq 1 30); do
+                        if curl -fsS "http://127.0.0.1:${APP_PORT}/" >/dev/null 2>&1 || curl -fsS "http://host.docker.internal:${APP_PORT}/" >/dev/null 2>&1; then
+                            HEALTHY=true
                             echo "✅ HTTP server respondendo na porta ${APP_PORT}!"
                             break
                         fi
                         sleep 1
                     done
+
+                    if [ "$HEALTHY" != "true" ]; then
+                        echo "❌ HTTP check na porta ${APP_PORT} falhou após 30s. Status: $(docker inspect --format='{{.State.Status}} (restarts={{.RestartCount}})' "${CONTAINER_NAME}" 2>/dev/null || true)"
+                        docker logs --tail=60 "${CONTAINER_NAME}" || true
+                        exit 1
+                    fi
 
                     docker image prune -f --filter 'until=24h' || true
                 '''
