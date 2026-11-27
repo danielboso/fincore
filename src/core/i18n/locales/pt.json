@@ -3,14 +3,28 @@
     "dashboard": "Painel",
     "transactions": "Transações",
     "logout": "Sair",
-    "language": "Idioma",
     "en": "Inglês",
     "pt": "Português",
     "common": {
       "cancel": "Cancelar",
-      "save": "Salvar",
       "saving": "Salvando...",
       "deleteConfirm": "Tem certeza que deseja excluir esta transação?"
+    },
+    "dashboardPage": {
+      "title": "Visão Geral Financeira",
+      "subtitle": "Resumo consolidado de saldo, receitas, despesas e economia líquida do mês",
+      "kpis": {
+        "initialBalance": "SALDO INICIAL DO MÊS",
+        "initialBalanceNote": "Herdado do ciclo anterior",
+        "monthlyIncome": "RECEITAS DO MÊS",
+        "projectedIncome": "Previsto",
+        "consolidatedExpenses": "DESPESAS CONSOLIDADAS",
+        "consumed": "consumido",
+        "margin": "Margem",
+        "netSavings": "ECONOMIA LÍQUIDA (SUPERÁVIT)",
+        "savingsRate": "Poupança",
+        "projectedClose": "Projeção Fechamento"
+      }
     },
     "transactionsPage": {
       "title": "Transações",
