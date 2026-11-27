@@ -16,6 +16,8 @@
   --font-heading: var(--font-sans);
   --font-sans: 'Inter Variable', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --color-primary: #006fee;
+  --color-primary-foreground: #ffffff;
 }
 
 @layer base {
